@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lend a Book</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      header {
+        background-color: #600080;
+        color: white;
+        padding: 1em;
+        text-align: center;
+        margin-bottom: 20px;
+        width: 100%;
+      }
+
+      .form-container,
+      .table-container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 45%;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        padding: 15px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #600080;
+        color: white;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select,
+      button {
+        width: calc(100% - 30px);
+        padding: 10px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #600080;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Lend a Book</h1>
+    </header>
+
+    <div class="form-container">
+      <form id="addBookForm">
+        <label for="username">Username:</label>
+        <select id="usernameSelect" name="username" required></select>
+
+        <label for="bookName">Book Name:</label>
+        <select id="bookNameSelect" name="bookName" required></select>
+
+        <label for="returnDate">Return Date:</label>
+        <input type="date" id="returnDate" name="returnDate" required />
+
+        <button type="button" onclick="addDetails()">Submit</button>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Book Title</th>
+            <th>Return Date</th>
+          </tr>
+        </thead>
+        <tbody id="detailsTableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      function fetchUsers() {
+        fetch("http://127.0.0.1:5000/members", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const usernameSelect = document.getElementById("usernameSelect");
+            usernameSelect.innerHTML = ""; // Clear previous options
+
+            data.members.forEach((member) => {
+              const option = document.createElement("option");
+              option.value = member.username;
+              option.textContent = member.username;
+              usernameSelect.appendChild(option);
+            });
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+      }
+
+      function fetchBooks() {
+        fetch("http://127.0.0.1:5000/books", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const bookNameSelect = document.getElementById("bookNameSelect");
+            bookNameSelect.innerHTML = ""; // Clear previous options
+
+            data.forEach((book) => {
+              const option = document.createElement("option");
+              option.value = book.title; // Using title instead of bookID
+              option.textContent = book.title;
+              bookNameSelect.appendChild(option);
+            });
+          })
+          .catch((error) => console.error("Error fetching books:", error));
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchUsers();
+        fetchBooks();
+      });
+
+      function addDetails() {
+        const username = document.getElementById("usernameSelect").value;
+        const title = document.getElementById("bookNameSelect").value;
+        const returnDate = document.getElementById("returnDate").value;
+
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+                <td>${username}</td>
+                <td>${title}</td>
+                <td>${returnDate}</td>
+            `;
+
+        const detailsTableBody = document.getElementById("detailsTableBody");
+        detailsTableBody.appendChild(newRow);
+
+        // Clear the input fields after adding the details
+        document.getElementById("usernameSelect").value = "";
+        document.getElementById("bookNameSelect").value = "";
+        document.getElementById("returnDate").value = "";
+
+        // Now, you can make a POST request to your Flask endpoint to actually lend the book
+        const data = {
+          username: username,
+          title: title,
+          start_date: new Date().toLocaleDateString(), // Current date as start date
+          last_date: returnDate, // End date as provided in the form
+        };
+
+        fetch("http://127.0.0.1:5000/lend-book", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Book lent successfully:", data);
+          })
+          .catch((error) => console.error("Error lending book:", error));
+      }
+    </script>
+  </body>
+</html>

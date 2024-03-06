@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Search</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 20px;
+            width: 200px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
+        }
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+* {
+
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  margin-top: 50px;
+  overflow: hidden;
+}
+.input-box {
+  position: relative;
+  border: solid black;
+  width: 100%;
+  max-width: 60px;
+  height: 55px;
+  margin: 0 50px;
+  background-color: #fff;
+  border-radius: 6px;
+  transition: all 0.5s ease-in-out;
+}
+.input-box.open {
+  max-width: 350px;
+}
+.input-box input {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  padding: 0 15px;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.5s ease-in-out;
+}
+.input-box.open input {
+  padding: 0 15px 0 65px;
+}
+
+.input-box .search {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.input-box.open .search {
+  border-radius: 6px 0 0 6px;
+}
+.search .search-icon {
+  font-size: 30px;
+  color: #1c1c1c;
+}
+.input-box .close-icon {
+  position: absolute;
+  top: 50%;
+  right: -45px;
+  font-size: 30px;
+  color: #1c1c1c;
+  padding: 5px;
+  transform: translateY(-50%);
+  transition: all 0.5s ease-in-out;
+  cursor: pointer;
+  pointer-events: none;
+  opacity: 0;
+}
+.input-box.open .close-icon {
+  transform: translateY(-50%) rotate(180deg);
+  pointer-events: auto;
+  opacity: 1;
+}
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <label for="title">Title:</label>
+        <input type="text" id="title" placeholder="Enter title">
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" placeholder="Enter author">
+
+        <button onclick="searchBooks()">Search</button>
+
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Published Year</th>
+                    <th>Avg Rating</th>
+                    <th>Publisher</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function searchBooks() {
+            var title = document.getElementById('title').value;
+            var author = document.getElementById('author').value;
+
+            // Fetch data from the Flask API endpoint
+            fetch('http://127.0.0.1:5000/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title || "",
+                    author: author || ""
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    if(!data){
+                        alert("No Results Found")
+                    }
+
+                    var tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+
+                    data.message.message.forEach(book => {
+                        var row = tableBody.insertRow(tableBody.rows.length);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        var cell4 = row.insertCell(3);
+                        var cell5 = row.insertCell(4);
+                        cell1.textContent = book.title;
+                        cell2.textContent = book.authors;
+                        cell3.textContent = book.publication_date;
+                        cell4.textContent = book.average_rating;
+                        cell5.textContent = book.publisher;
+
+                       
+
+                    });
+                    console.log(data.message.message)
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    </script>
+
+</body>
+
+</html>

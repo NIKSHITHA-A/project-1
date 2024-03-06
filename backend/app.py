@@ -15,7 +15,7 @@ db = client['StanchBook']
 users_collection = db['Users']
 books_collection = db['BooksCollection']
 
-# Endpoint for Frappe API
+
 FRAPPE_API_URL = "https://frappe.io/api/method/frappe-library"
 class Book:
     def __init__(self, book_data):
@@ -25,8 +25,8 @@ class Book:
         self.publisher = book_data.get('publisher')
         self.page_count = book_data.get('num_pages')
         self.publication_date = book_data.get('publication_date')
-        self.available = True  # Indicates if the book is available for borrowing
-        self.rent_fee = 50  # Default rent fee in Rs.
+        self.available = True  
+        self.rent_fee = 50 
 
 class Member:
     def __init__(self, username, password, max_debt=500):
@@ -34,7 +34,7 @@ class Member:
         self.password = password
         self.max_debt = max_debt
         self.books_borrowed = []
-# Function to fetch books from Frappe API
+
 @app.route('/books',methods=['GET'])
 def fetch_books_from_api(title="", authors="", isbn="", publisher="", page=1):
     params = {
@@ -55,11 +55,11 @@ def fetch_books_from_api(title="", authors="", isbn="", publisher="", page=1):
 def index():
     return "Welcome to Library Management System"
 
-# Endpoint to fetch books from Frappe API
 
 
 
-# Endpoint to create a new book record
+
+
 @app.route('/books', methods=['POST'])
 def create_book():
     data = request.json
@@ -68,12 +68,12 @@ def create_book():
     if books_collection.find_one({'bookID': book_id}):
         return jsonify({'error': 'Book with the same ID already exists'}), 400
 
-    # Insert the new book record into MongoDB collection
+    
     books_collection.insert_one(data)
 
     return jsonify({'message': 'Book created successfully'})
 
-# Endpoint to read a specific book record
+
 @app.route('/books/<book_id>', methods=['GET'])
 def read_book(book_id):
     book = books_collection.find_one({'bookID': book_id})
@@ -83,7 +83,7 @@ def read_book(book_id):
 
     return jsonify({'book': book})
 
-# Endpoint to update an existing book record
+
 @app.route('/books/<book_id>', methods=['PUT'])
 def update_book(book_id):
     data = request.json
@@ -92,12 +92,12 @@ def update_book(book_id):
     if not book:
         return jsonify({'error': 'Book not found'}), 404
 
-    # Update the book record in the MongoDB collection
+    
     books_collection.update_one({'bookID': book_id}, {'$set': data})
 
     return jsonify({'message': 'Book updated successfully'})
 
-# Endpoint to delete an existing book record
+
 @app.route('/books/<book_id>', methods=['DELETE'])
 def delete_book(book_id):
     result = books_collection.delete_one({'bookID': book_id})
@@ -124,42 +124,36 @@ def borrow_book():
     book_id = data.get('book_id')
     member_id = data.get('member_id')
 
-    # Check if the book and member exist
+    
     book = mongo.db.books.find_one({'bookID': book_id})
     member = mongo.db.members.find_one({'member_id': member_id})
 
     if not book or not member:
         return jsonify({'error': 'Book or member not found'}), 404
 
-    # Check if the member's outstanding debt is less than Rs. 500
+    
     if member['outstanding_debt'] >= 500:
         return jsonify({'error': 'Member has outstanding debt exceeding Rs. 500. Cannot borrow a book.'}), 400
 
-    # Issue the book to the member (you may need to define a 'borrowed_books' field in the member document)
-    # Update member's outstanding debt, e.g., increment it by a rental fee
-
-    # ...
+    
 
     return jsonify({'message': 'Book borrowed successfully'})
 
-# Route to return a book
+
 @app.route('/return', methods=['POST'])
 def return_book():
     data = request.json
     book_id = data.get('book_id')
     member_id = data.get('member_id')
 
-    # Check if the book and member exist
+    
     book = mongo.db.books.find_one({'bookID': book_id})
     member = mongo.db.members.find_one({'member_id': member_id})
 
     if not book or not member:
         return jsonify({'error': 'Book or member not found'}), 404
 
-    # Update the book status (returning the book)
-    # Update the member's outstanding debt, e.g., charge a rent fee
-
-    # ...
+   
 
     return jsonify({'message': 'Book returned successfully'}) 
 def generate_random_id():
@@ -169,7 +163,7 @@ def import_books():
     title = request.args.get('title', '')
     page = request.args.get('page', 1)
     
-    # Fetch books from Frappe API
+    
     response = requests.get(FRAPPE_API_URL, params={"title": title, "page": page})
     
     if response.status_code == 200:
@@ -180,7 +174,7 @@ def import_books():
         
 
         
-        # Insert fetched books into MongoDB collection
+        
    
 
         return jsonify({'books': books_data, 'message': 'Books imported successfully'})
@@ -195,32 +189,32 @@ def create_member():
 
     new_member = Member(username, password, max_debt)
 
-    # Insert the new member into MongoDB collection
-    members_collection.insert_one(new_member.__dict__)
+    
+    users_collection.insert_one(new_member.__dict__)
 
     return jsonify({'message': 'Member created successfully'})
 
-# Read all members
+
 @app.route('/members', methods=['GET'])
 def read_all_members():
-    members = list(members_collection.find({}, {'_id': 0}))
+    members = list(users_collection.find({}, {'_id': 0}))
     return jsonify({'members': members})
 
-# Read a specific member
+
 @app.route('/members/<username>', methods=['GET'])
 def read_member(username):
-    member = members_collection.find_one({'username': username}, {'_id': 0})
+    member = users_collection.find_one({'username': username}, {'_id': 0})
     
     if not member:
         return jsonify({'error': 'Member not found'}), 404
 
     return jsonify({'member': member})
 
-# Update a member
+
 @app.route('/members/<username>', methods=['PUT'])
 def update_member(username):
     data = request.json
-    updated_member = members_collection.find_one_and_update(
+    updated_member = users_collection.find_one_and_update(
         {'username': username},
         {'$set': data},
         return_document=True
@@ -231,15 +225,63 @@ def update_member(username):
 
     return jsonify({'message': 'Member updated successfully'})
 
-# Delete a member
+
 @app.route('/members/<username>', methods=['DELETE'])
 def delete_member(username):
-    result = members_collection.delete_one({'username': username})
+    result = users_collection.delete_one({'username': username})
 
     if result.deleted_count == 0:
         return jsonify({'error': 'Member not found'}), 404
 
     return jsonify({'message': 'Member deleted successfully'})
+@app.route('/search', methods=['POST'])
+def search():
+    try:
+        data = request.get_json()
+        title = data.get('title', '')
+        author = data.get('author', '')
+
+        # Construct the API URL with the provided title and author
+        api_url = f'https://frappe.io/api/method/frappe-library?title={title}&authors={author}'
+
+        # Make the API request to frappe-library
+        response = requests.get(api_url)
+        results = response.json()
+
+        return jsonify({'message': results})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+@app.route('/lend-book', methods=['POST'])
+def lend_book():
+    data = request.json
+    username = data.get('username')
+    title = data.get('title')
+    start_date = data.get('start_date')
+    last_date = data.get('last_date')
+
+    # Check if the user exists
+    user = users_collection.find_one({'username': username})
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Check if the book exists
+    book = books_collection.find_one({'title': title})
+    if not book:
+        return jsonify({'error': 'Book not found'}), 404
+
+    # Create a new entry for the book in the user's borrowed books
+    borrowed_book = {
+        'bookId': str(book["_id"]),  # Convert ObjectId to string
+        'start_date': start_date,
+        'last_date': last_date
+    }
+    users_collection.update_one(
+        {'username': username},
+        {'$push': {'books_borrowed': borrowed_book}}
+    )
+
+    return jsonify({'message': 'Book lent successfully'})        
 
            
 

@@ -6,7 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
     <style>
-        /* Your existing styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #600080;
+            color: white;
+            padding: 1em;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        #searchContainer {
+            margin-bottom: 20px;
+        }
+
+        #searchInput {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #searchButton {
+            padding: 10px;
+            background-color: #600080;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 80%;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
         table {
             width: 100%;
@@ -28,6 +77,75 @@
         tr:hover {
             background-color: #f5f5f5;
         }
+
+        .book-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .book-card:hover {
+            transform: scale(1.05);
+        }
+
+        .book-card-content {
+            padding: 15px;
+        }
+
+        .book-card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .book-card-details {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .add-book-form {
+            width: 80%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .add-book-form label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .add-book-form input {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .add-book-form button {
+            padding: 10px;
+            background-color: #600080;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-book-form button:hover {
+            background-color: #450056;
+        }
     </style>
 </head>
 
@@ -48,16 +166,15 @@
                     <th>Title</th>
                     <th>Publisher</th>
                     <th>Average Rating</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="libraryTableBody">
-               
-            </tbody>
+            <tbody id="libraryTableBody"></tbody>
         </table>
-        
     </div>
-    
-            <form id="addBookForm">
+
+    <div class="add-book-form">
+        <form id="addBookForm">
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required>
 
@@ -69,15 +186,13 @@
 
             <button type="button" onclick="addBook()">Add Book</button>
         </form>
-        
+    </div>
 
     <script>
-        // Function to fetch books from the Flask backend
         function fetchBooks() {
             fetch('http://127.0.0.1:5000/books')
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     const tableBody = document.getElementById('libraryTableBody');
                     tableBody.innerHTML = ''; // Clear existing data
 
@@ -87,6 +202,7 @@
                             <td>${book.title}</td>
                             <td>${book.publisher}</td>
                             <td>${book.average_rating}</td>
+                            <td><button onclick="deleteBook('${book.title}')">Delete</button></td>
                         `;
                         tableBody.appendChild(row);
                     });
@@ -94,15 +210,11 @@
                 .catch(error => console.error('Error fetching books:', error));
         }
 
-        // Initial fetch when the page loads
         fetchBooks();
 
-        // Function to search for books
         function searchBooks() {
             const searchInput = document.getElementById('searchInput').value;
 
-            // Perform search by sending data to the Flask backend
-            // You can modify the backend code to handle search functionality
             fetch(`http://127.0.0.1:5000/search?book_title=${searchInput}`)
                 .then(response => response.json())
                 .then(data => {
@@ -115,13 +227,60 @@
                             <td>${book.title}</td>
                             <td>${book.publisher}</td>
                             <td>${book.average_rating}</td>
+                            <td><button onclick="deleteBook('${book.title}')">Delete</button></td>
                         `;
                         tableBody.appendChild(row);
                     });
                 })
                 .catch(error => console.error('Error searching books:', error));
         }
+
+        function addBook() {
+            const title = document.getElementById('title').value;
+            const publisher = document.getElementById('publisher').value;
+            const averageRating = document.getElementById('average_rating').value;
+
+            fetch('http://127.0.0.1:5000/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    publisher: publisher,
+                    average_rating: averageRating,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // Clear input fields after adding a book
+                    document.getElementById('title').value = '';
+                    document.getElementById('publisher').value = '';
+                    document.getElementById('average_rating').value = '';
+                    // Fetch updated book list
+                    fetchBooks();
+                })
+                .catch(error => console.error('Error adding book:', error));
+        }
+
+        function deleteBook(title) {
+            const confirmDelete = confirm(`Are you sure you want to delete the book "${title}"?`);
+            if (confirmDelete) {
+                fetch(`http://127.0.0.1:5000/books/${title}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        // Fetch updated book list
+                        fetchBooks();
+                    })
+                    .catch(error => console.error('Error deleting book:', error));
+            }
+        }
     </script>
 </body>
 
 </html>
+

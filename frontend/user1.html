@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User CRUD Operations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #600080;
+            color: white;
+            padding: 1em;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .form-container,
+        .table-container {
+            background-color: #BCC6CC;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #600080;
+            color: white;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input,
+        select,
+        button {
+            width: calc(100% - 30px);
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #600080;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #450056;
+        }
+
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container label,
+        .form-container input,
+        .form-container select {
+            width: 80%;
+        }
+
+        .form-container button {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>User CRUD Operations</h1>
+    </header>
+
+    <div class="form-container">
+        <form id="userForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="maxDebt">Maximum Debt:</label>
+            <input type="number" id="maxDebt" name="maxDebt" required>
+
+            <button type="button" onclick="createUser()">Create User</button>
+            
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Maximum Debt</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Function to create a new user
+        function createUser() {
+            const username = document.getElementById('username').value;
+            const maxDebt = document.getElementById('maxDebt').value;
+
+            // You should replace the following URL with your actual API endpoint for creating users
+            const apiUrl = 'http://127.0.0.1:5000/members';
+
+            // Make a POST request to create a new user
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    maxDebt: maxDebt,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // After creating a user, fetch and display the updated user list
+                    window.location.reload()
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+
+        // Function to update an existing user
+        function updateUser() {
+            const username = document.getElementById('username').value;
+            const maxDebt = document.getElementById('maxDebt').value;
+
+            // You should replace the following URL with your actual API endpoint for updating users
+            const apiUrl = 'http://127.0.0.1:5000/members';
+
+            // Make a PUT request to update the user
+            fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    maxDebt: maxDebt,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // After updating a user, fetch and display the updated user list
+                    fetchUsers();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+
+        // Function to fetch and display the list of users
+        // Function to fetch and display the list of users
+// Function to fetch and display the list of users
+function fetchUsers() {
+    // You should replace the following URL with your actual API endpoint for fetching users
+    const apiUrl = 'http://127.0.0.1:5000/members';
+
+    // Make a GET request to fetch the list of users
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Clear existing data in the table body
+            const tableBody = document.getElementById('userTableBody');
+            tableBody.innerHTML = '';
+
+            // Check if the response has a "members" property and it is an array
+            if (data.members && Array.isArray(data.members)) {
+                // Populate the table with the fetched user data
+                data.members.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.max_debt}</td>
+                        <td>
+                            <button onclick="editUser('${user.id}')">Edit</button>
+                            <button onclick="deleteUser('${user.id}')">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                console.error('Invalid response format:', data);
+            }
+        })
+        .catch(error => console.error('Error fetching users:', error));
+
+}
+document.addEventListener('DOMContentLoaded', function () {
+        fetchUsers();
+    });
+
+</script>
+</body>
+</html>
