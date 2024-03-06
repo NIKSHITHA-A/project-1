@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        /* Your existing styles here */
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Library Management System</h1>
+    </header>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Publisher</th>
+                    <th>Page Number</th>
+                </tr>
+            </thead>
+            <tbody id="libraryTableBody">
+                <!-- Data will be populated here dynamically using JavaScript -->
+            </tbody>
+        </table>
+        <form id="addBookForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="publisher">Publisher:</label>
+            <input type="text" id="publisher" name="publisher" required>
+
+            <label for="pageNumber">Page Number:</label>
+            <input type="number" id="pageNumber" name="pageNumber" required>
+
+            <button type="button" onclick="addBook()">Add Book</button>
+        </form>
+    </div>
+
+    <script>
+        function addBook() {
+            const titleInput = document.getElementById('title').value;
+            const publisherInput = document.getElementById('publisher').value;
+            const pageNumberInput = document.getElementById('pageNumber').value;
+
+            // Create a new row and populate it with input values
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${titleInput}</td>
+                <td>${publisherInput}</td>
+                <td>${pageNumberInput}</td>
+            `;
+
+            // Append the new row to the table in the Library Management System page
+            const libraryTableBody = window.opener.document.getElementById('libraryTableBody');
+            libraryTableBody.appendChild(row);
+
+            // Clear the input fields after adding the book
+            document.getElementById('title').value = '';
+            document.getElementById('publisher').value = '';
+            document.getElementById('pageNumber').value = '';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        /* Your existing styles */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #600080;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Library Management System</h1>
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button id="searchButton" onclick="searchBooks()">Search</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <p>LIST OF BOOKS AVAILABLE</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Publisher</th>
+                    <th>Average Rating</th>
+                </tr>
+            </thead>
+            <tbody id="libraryTableBody">
+               
+            </tbody>
+        </table>
+        
+    </div>
+    
+            <form id="addBookForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="publisher">Publisher:</label>
+            <input type="text" id="publisher" name="publisher" required>
+
+            <label for="average_rating">Average Rating:</label>
+            <input type="number" id="average_rating" name="average_rating" required>
+
+            <button type="button" onclick="addBook()">Add Book</button>
+        </form>
+        
+
+    <script>
+        // Function to fetch books from the Flask backend
+        function fetchBooks() {
+            fetch('http://127.0.0.1:5000/books')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const tableBody = document.getElementById('libraryTableBody');
+                    tableBody.innerHTML = ''; // Clear existing data
+
+                    data.forEach(book => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${book.title}</td>
+                            <td>${book.publisher}</td>
+                            <td>${book.average_rating}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching books:', error));
+        }
+
+        // Initial fetch when the page loads
+        fetchBooks();
+
+        // Function to search for books
+        function searchBooks() {
+            const searchInput = document.getElementById('searchInput').value;
+
+            // Perform search by sending data to the Flask backend
+            // You can modify the backend code to handle search functionality
+            fetch(`http://127.0.0.1:5000/search?book_title=${searchInput}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('libraryTableBody');
+                    tableBody.innerHTML = ''; // Clear existing data
+
+                    data.forEach(book => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${book.title}</td>
+                            <td>${book.publisher}</td>
+                            <td>${book.average_rating}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error searching books:', error));
+        }
+    </script>
+</body>
+
+</html>
