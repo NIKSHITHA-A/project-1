@@ -102,21 +102,46 @@
         .form-container button {
             width: 50%;
         }
+        
+        nav {
+            background-color: #600080;
+            padding: 1em;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: whitesmoke;
+            text-decoration: none;
+            padding: 0.5em 1em;
+            margin: 0 1em;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 
 <body>
+    <nav>
+        
+        <a href="borrow_book.html">Borrow Book</a>
+        <a href="return.html">Return Book</a>
+       
+        <a href="search.html">Search</a>
+        <a href="user1.html">User 1</a>
+    </nav>
 
     <header>
-        <h1>User CRUD Operations</h1>
+        <h1>USER CREATION</h1>
     </header>
 
     <div class="form-container">
         <form id="userForm">
-            <label for="username">Username:</label>
+            <label for="username"><b>Username:</b></label>
             <input type="text" id="username" name="username" required>
 
-            <label for="maxDebt">Maximum Debt:</label>
+            <label for="maxDebt"><b>Maximum Debt:</b></label>
             <input type="number" id="maxDebt" name="maxDebt" required>
 
             <button type="button" onclick="createUser()">Create User</button>
@@ -138,15 +163,15 @@
     </div>
 
     <script>
-        // Function to create a new user
+        
         function createUser() {
             const username = document.getElementById('username').value;
             const maxDebt = document.getElementById('maxDebt').value;
 
-            // You should replace the following URL with your actual API endpoint for creating users
+            
             const apiUrl = 'http://127.0.0.1:5000/members';
 
-            // Make a POST request to create a new user
+            
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -160,7 +185,7 @@
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
-                    // After creating a user, fetch and display the updated user list
+               
                     window.location.reload()
                 })
                 .catch(error => {
@@ -169,15 +194,15 @@
                 });
         }
 
-        // Function to update an existing user
+        
         function updateUser() {
             const username = document.getElementById('username').value;
             const maxDebt = document.getElementById('maxDebt').value;
 
-            // You should replace the following URL with your actual API endpoint for updating users
+            
             const apiUrl = 'http://127.0.0.1:5000/members';
 
-            // Make a PUT request to update the user
+            
             fetch(apiUrl, {
                 method: 'PUT',
                 headers: {
@@ -191,7 +216,7 @@
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
-                    // After updating a user, fetch and display the updated user list
+                    
                     fetchUsers();
                 })
                 .catch(error => {
@@ -200,24 +225,22 @@
                 });
         }
 
-        // Function to fetch and display the list of users
-        // Function to fetch and display the list of users
-// Function to fetch and display the list of users
+        
 function fetchUsers() {
-    // You should replace the following URL with your actual API endpoint for fetching users
+    
     const apiUrl = 'http://127.0.0.1:5000/members';
 
-    // Make a GET request to fetch the list of users
+    
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // Clear existing data in the table body
+            
             const tableBody = document.getElementById('userTableBody');
             tableBody.innerHTML = '';
 
-            // Check if the response has a "members" property and it is an array
+            
             if (data.members && Array.isArray(data.members)) {
-                // Populate the table with the fetched user data
+                
                 data.members.forEach(user => {
                     const row = document.createElement('tr');
                     row.innerHTML = `

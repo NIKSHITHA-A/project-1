@@ -281,7 +281,32 @@ def lend_book():
         {'$push': {'books_borrowed': borrowed_book}}
     )
 
-    return jsonify({'message': 'Book lent successfully'})        
+    return jsonify({'message': 'Book lent successfully'})
+@app.route('/listBooks', methods=['POST'])
+def list_books():
+    username = request.form.get('username')
+    user_data = users_collection.find_one({'username': username})
+    # print(user_data)
+    if user_data:
+        books_borrowed = user_data.get('books_borrowed', [])
+        return jsonify(books_borrowed)
+    else:
+        return jsonify([])
+@app.route('/returnBook', methods=['POST'])
+def return_books():
+    username = request.form.get('username')
+    book_id = request.form.get('bookId')
+
+    # Search for the user in the 'Users' collection
+    user = users_collection.find_one({'username': username})
+
+    if user:
+        # Remove the book with matching bookId from the 'borrowed_books' array
+        users_collection.update_one({'username': username}, {'$pull': {'books_borrowed': {'bookId': book_id}}})
+        
+        return jsonify({'message': 'Book returned successfully for user ' + username})
+    else:
+        return jsonify({'message': 'User not found.'})        
 
            
 

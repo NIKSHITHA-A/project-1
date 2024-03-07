@@ -18,6 +18,22 @@
             min-height: 100vh;
         }
 
+        nav {
+            background-color: #600080;
+            padding: 1em;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: whitesmoke;
+            text-decoration: none;
+            padding: 0.5em 1em;
+            margin: 0 1em;
+            font-weight: bold;
+        }
+
         header {
             background-color: #600080;
             color: white;
@@ -150,6 +166,14 @@
 </head>
 
 <body>
+    <nav>
+        
+        <a href="borrow_book.html">Borrow Book</a>
+        <a href="return.html">Return Book</a>
+       
+        <a href="search.html">Search</a>
+        <a href="user1.html">User 1</a>
+    </nav>
     <header>
         <h1>Library Management System</h1>
         <div id="searchContainer">
@@ -173,20 +197,7 @@
         </table>
     </div>
 
-    <div class="add-book-form">
-        <form id="addBookForm">
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" required>
-
-            <label for="publisher">Publisher:</label>
-            <input type="text" id="publisher" name="publisher" required>
-
-            <label for="average_rating">Average Rating:</label>
-            <input type="number" id="average_rating" name="average_rating" required>
-
-            <button type="button" onclick="addBook()">Add Book</button>
-        </form>
-    </div>
+    
 
     <script>
         function fetchBooks() {
@@ -273,7 +284,7 @@
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        // Fetch updated book list
+                       
                         fetchBooks();
                     })
                     .catch(error => console.error('Error deleting book:', error));
@@ -283,4 +294,3 @@
 </body>
 
 </html>
-

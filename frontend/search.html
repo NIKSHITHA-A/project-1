@@ -12,13 +12,64 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+        }
+
+        nav {
+            background-color: #600080;
+            padding: 1em;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: whitesmoke;
+            text-decoration: none;
+            padding: 0.5em 1em;
+            margin: 0 1em;
+            font-weight: bold;
         }
 
         .container {
             text-align: center;
+            border: 8px solid #600080;
+            border-radius: 20px; 
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .container:before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px; 
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, #600080, #ff00ff); 
+            border-radius: 20px 20px 0 0; 
+        }
+
+        .container:after {
+            content: '';
+            position: absolute;
+            bottom: -8px; 
+            left: -8px; 
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, #ff00ff, #600080); 
+            border-radius: 0 0 20px 20px; 
+        }
+
+        .heading {
+            font-size: 24px;
+            color: #600080;
+            margin-bottom: 20px;
         }
 
         label {
@@ -29,14 +80,14 @@
         input {
             padding: 8px;
             margin-bottom: 20px;
-            width: 200px;
+            width: 100%;
             font-size: 16px;
         }
 
         button {
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #4caf50;
+            background-color: purple;
             color: white;
             border: none;
             cursor: pointer;
@@ -56,97 +107,22 @@
         }
 
         th {
-            background-color: #4caf50;
+            background-color: #600080;
             color: white;
         }
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
-
-* {
-
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-body {
-  min-height: 100vh;
-  display: flex;
-  margin-top: 50px;
-  overflow: hidden;
-}
-.input-box {
-  position: relative;
-  border: solid black;
-  width: 100%;
-  max-width: 60px;
-  height: 55px;
-  margin: 0 50px;
-  background-color: #fff;
-  border-radius: 6px;
-  transition: all 0.5s ease-in-out;
-}
-.input-box.open {
-  max-width: 350px;
-}
-.input-box input {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  font-size: 16px;
-  font-weight: 400;
-  color: #333;
-  padding: 0 15px;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  transition: all 0.5s ease-in-out;
-}
-.input-box.open input {
-  padding: 0 15px 0 65px;
-}
-
-.input-box .search {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 60px;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.input-box.open .search {
-  border-radius: 6px 0 0 6px;
-}
-.search .search-icon {
-  font-size: 30px;
-  color: #1c1c1c;
-}
-.input-box .close-icon {
-  position: absolute;
-  top: 50%;
-  right: -45px;
-  font-size: 30px;
-  color: #1c1c1c;
-  padding: 5px;
-  transform: translateY(-50%);
-  transition: all 0.5s ease-in-out;
-  cursor: pointer;
-  pointer-events: none;
-  opacity: 0;
-}
-.input-box.open .close-icon {
-  transform: translateY(-50%) rotate(180deg);
-  pointer-events: auto;
-  opacity: 1;
-}
     </style>
 </head>
 
 <body>
+    <nav>
+        <a href="borrow_book.html">Borrow Book</a>
+        <a href="return.html">Return Book</a>
+        <a href="search.html">Search</a>
+        <a href="user1.html">User 1</a>
+    </nav>
 
     <div class="container">
+        <div class="heading">Search Book</div>
         <label for="title">Title:</label>
         <input type="text" id="title" placeholder="Enter title">
 
@@ -166,7 +142,7 @@ body {
                 </tr>
             </thead>
             <tbody>
-               
+
             </tbody>
         </table>
     </div>
@@ -210,8 +186,6 @@ body {
                         cell4.textContent = book.average_rating;
                         cell5.textContent = book.publisher;
 
-                       
-
                     });
                     console.log(data.message.message)
                 })
@@ -222,3 +196,4 @@ body {
 </body>
 
 </html>
+
